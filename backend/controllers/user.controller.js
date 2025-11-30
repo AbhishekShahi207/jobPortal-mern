@@ -1,17 +1,32 @@
 import { User } from "../models/user.model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import getDataUri from "../utils/datauri.js";
+import cloudinary from "../utils/cloudinary.js";
 
 export const register = async (req, res) => {
   try {
     const { fullname, email, password, phoneNumber, role } = req.body;
-    
+
     if (!fullname || !email || !password || !phoneNumber || !role) {
       return res.status(400).json({
         message: "Please fill all the details",
         success: false,
       });
     }
+    const file=req.file
+ let cloudResponse = null;
+
+    // UPLOAD PROFILE PHOTO IF PROVIDED
+    if (file) {
+      const fileUri = getDataUri(file);
+
+      cloudResponse = await cloudinary.uploader.upload(fileUri.content, {
+        resource_type: "image",
+        folder: "profile-photos",
+      });
+    }
+
     const user = await User.findOne({ email: email });
     if (user) {
       return res.status(400).json({
@@ -28,14 +43,15 @@ export const register = async (req, res) => {
       password: hashedPassword,
       role: role,
       phoneNumber: phoneNumber,
+      profile:{
+   profilePhoto: cloudResponse?.secure_url || null, 
+      }
     });
-    return res
-      .status(201)
-      .json({
-        message: "Account Created Successfully",
-        newUser,
-        success: true,
-      });
+    return res.status(201).json({
+      message: "Account Created Successfully",
+      newUser,
+      success: true,
+    });
   } catch (error) {
     console.log("Error in Register Controller", error);
     return res.status(500).json({ message: "Internal server Error" });
@@ -45,7 +61,7 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
   try {
     const { email, password, role } = req.body;
-    
+
     if (!email || !password || !role) {
       return res.status(400).json({
         message: "Please fill all the details",
@@ -95,7 +111,9 @@ export const login = async (req, res) => {
       .cookie("token", token, {
         maxAge: 7 * 24 * 60 * 60 * 1000,
         httpOnly: true,
-        sameSite: "strict",
+        sameSite: "lax",
+        secure:false,
+        path:'/'
       })
       .json({
         message: `Welcome back ${user.fullname}`,
@@ -113,17 +131,28 @@ export const logout = async (req, res) => {
     return res
       .status(200)
       .cookie("token", "", { maxAge: 0 })
-      .json({ message: "Loout Successfully", success: true });
+      .json({ message: "Logout Successfully", success: true });
   } catch (error) {
     console.log("Error in logout controller", error);
     return res.status(500).json("Internal Server Error");
   }
 };
 
-export const updateProfile = async (req,res) => {
+export const updateProfile = async (req, res) => {
   try {
-    const { fullname, email, phoneNumber,skills, bio } = req.body;
-    const file = req.file;
+    const { fullname, email, phoneNumber, skills, bio } = req.body;
+
+    let cloudResponse = null;  // <-- declare outside
+const file=req.file
+if (file) {
+  const fileUri = getDataUri(file);
+
+  cloudResponse = await cloudinary.uploader.upload(fileUri.content, {
+    resource_type: "raw",
+    folder: "resumes",
+    public_id: `${Date.now()}.pdf`
+  });
+}
 
     let skillsArray;
     if (skills) {
@@ -144,6 +173,11 @@ export const updateProfile = async (req,res) => {
     if (bio) user.profile.bio = bio;
     if (skills) user.profile.skills = skillsArray;
 
+    if (cloudResponse) {
+      user.profile.resume = cloudResponse.secure_url; // saving resume link
+      user.profile.resumeOriginalName = file.originalname; //save file name
+    }
+
     await user.save();
 
     user = {
@@ -159,6 +193,6 @@ export const updateProfile = async (req,res) => {
       .status(200)
       .json({ message: "Profile Updated", user, success: true });
   } catch (error) {
-    console.log("Error in updateprofile controller",error);
+    console.log("Error in updateprofile controller", error);
   }
 };

@@ -6,10 +6,33 @@ import {
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import {  LogOut, User2 } from 'lucide-react';
-import { Link, NavLink } from "react-router";
+import { Link, NavLink, useNavigate } from "react-router";
+import { useDispatch, useSelector } from "react-redux";
+import axios from "axios"
+import { USER_API_END_POINT } from "../../utils/constant";
+import { toast } from "sonner";
+import { setUser } from "../../redux/authSlice";
 
 const Navbar = () => {
-    const user=true;
+    
+  const navigate =useNavigate()
+  const dispatch=useDispatch()
+    const {user}=useSelector(store=>store.auth)
+
+    const logoutHandler = async()=>{
+try {
+  const res= await axios.post(`${USER_API_END_POINT}/logout`,{},{withCredentials:true})
+  if(res.data.success){
+ dispatch(setUser(null))
+  toast.success(res.data.message)
+  navigate("/signup")
+  }
+ 
+} catch (error) {
+  console.log(error)
+  toast.error(error.response.data.message)
+}
+    }
 
   return (
     <div className="bg-white">
@@ -37,7 +60,7 @@ const Navbar = () => {
             ( <Popover>
             <PopoverTrigger asChild>
               <Avatar className="cursor-pointer">
-                <AvatarImage src="https://github.com/shadcn.png" />
+                <AvatarImage src={user?.profile?.profilePhoto} alt="profile" />
               </Avatar>
             </PopoverTrigger>
             <PopoverContent className="w-80">
@@ -45,23 +68,23 @@ const Navbar = () => {
               <div className="flex gap-4 items-center">
                 {" "}
                 <Avatar className="cursor-pointer">
-                  <AvatarImage src="https://github.com/shadcn.png" />
+                  <AvatarImage src={user?.profile?.profilePhoto}  />
                 </Avatar>
                 <div>
-                  <h4 className="font-medium">Abhishek Shahi</h4>
+                  <h4 className="font-medium">{user?.fullname}</h4>
                   <p className="text-sm text-muted-foreground ">
-                    Lorem ipsum dolor sit amet.s
+                   {user?.profile?.bio}
                   </p>
                 </div>
               </div>
               <div className="flex flex-col my-2  text-gray-600">
                 <div className="flex w-fit gap-2 cursor-pointer items-center">
                     <User2/>
-                  <Button variant="link" className="border-none">View Profile</Button>
+                  <Button variant="link" className="border-none"><Link to="/profile" >View Profile</Link></Button>
                 </div>
                 <div className="flex w-fit gap-2 cursor-pointer items-center">
                     <LogOut />
-                  <Button variant="link">Logout</Button>
+                  <Button onClick={logoutHandler} variant="link">Logout</Button>
                 </div>
               </div>
               </div>

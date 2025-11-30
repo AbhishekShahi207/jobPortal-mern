@@ -57,26 +57,29 @@ export const postJob = async (req, res) => {
 
 //for student
 export const getAllJobs = async (req, res) => {
-  try {
-    const keyword = req.query.keyword || "";
-    const query = {
-      $or: [
-        { title: { $regex: keyword, $options: "i" } },
-        { description: { $regex: keyword, $options: "i" } },
-      ],
-    };
-    const jobs = await Job.find(query).populate("company").sort({createdAt:-1});
-    if (jobs.length === 0) {
-      return res
-        .status(404)
-        .json({ message: "Jobs not found", success: false });
+    try {
+        const keyword = req.query.keyword || "";
+        const query = {
+            $or: [
+                { title: { $regex: keyword, $options: "i" } },
+                { description: { $regex: keyword, $options: "i" } },
+            ]
+        };
+        const jobs = await Job.find(query).populate({
+            path: "company"
+        }).sort({ createdAt: -1 });
+      
+       
+        return res.status(200).json({
+            jobs,
+            success: true
+        })
+     
+    } catch (error) {
+        console.log(error);
     }
-    return res.status(200).json({ jobs, success: true });
-  } catch (error) {
-    console.log("Error in getAllJobs controller",error);
-    return res.status(500).json({ message: "INternal Server Error" });
-  }
-};
+}
+
 
 //for student
 export const getJobById = async (req, res) => {
@@ -84,7 +87,7 @@ export const getJobById = async (req, res) => {
     const jobId = req.params.id;
     const job = await Job.findById(jobId).populate("company");
 
-    if (job.length === 0) {
+    if (!job) {
       return res
         .status(404)
         .json({ message: "Jobs not found", success: false });

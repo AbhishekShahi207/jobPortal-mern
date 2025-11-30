@@ -8,7 +8,7 @@ const router=express.Router()
 router.post("/register",singleUpload,register)
 router.post("/login",login)
 router.post("/logout",logout)
-router.put("/profile/update",isAuthenticated,updateProfile)
+router.put("/profile/update",isAuthenticated,singleUpload,updateProfile)
 
 
 
