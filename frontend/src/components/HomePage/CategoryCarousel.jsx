@@ -16,11 +16,12 @@ const categories =[
     "Ui/Ux Designer"
 ]
 
+
 const CategoryCarousel = () => {
 
     
   return (
-     <div className="w-full flex items-center justify-center mt-6 pt-3">
+     <div className="w-full flex items-center justify-center mt-6 pt-3 nocopy">
       <Carousel opts={{ loop: true ,dragFree:true}}  plugins={[
           Autoplay({
             delay: 1300,            // always running

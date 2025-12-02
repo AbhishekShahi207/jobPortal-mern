@@ -96,7 +96,7 @@ const UpdateProfileDialog = ({ open, setOpen }) => {
                                 <Label htmlFor="email" className="text-right">Email</Label>
                                 <Input
                                     id="email"
-                                    name="email"
+                                    name="emailaddress"
                                     type="email"
                                     value={input.email}
                                     onChange={changeEventHandler}

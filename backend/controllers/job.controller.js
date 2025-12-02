@@ -15,7 +15,7 @@ export const postJob = async (req, res) => {
       companyId,
     } = req.body;
     const userId = req.id;
-
+console.log(title,description,salary)
     if (
       !title ||
       !description ||
@@ -68,7 +68,7 @@ export const getAllJobs = async (req, res) => {
         const jobs = await Job.find(query).populate({
             path: "company"
         }).sort({ createdAt: -1 });
-      
+
        
         return res.status(200).json({
             jobs,
@@ -85,7 +85,7 @@ export const getAllJobs = async (req, res) => {
 export const getJobById = async (req, res) => {
   try {
     const jobId = req.params.id;
-    const job = await Job.findById(jobId).populate("company");
+    const job = await Job.findById(jobId).populate("applications");
 
     if (!job) {
       return res
@@ -104,7 +104,7 @@ export const getJobById = async (req, res) => {
 export const getAdminJobs = async (req, res) => {
   try {
     const adminId = req.id;
-    const jobs = await Job.find({ created_by: adminId });
+    const jobs = await Job.find({ created_by: adminId }).populate({path:"company",createdAt:-1})
 
     if (jobs.length === 0) {
       return res

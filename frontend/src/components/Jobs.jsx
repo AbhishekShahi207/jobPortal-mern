@@ -2,12 +2,14 @@ import React from "react";
 import Navbar from "./shared/Navbar";
 import FilterCard from "./JobsPage/FilterCard";
 import Job from "./JobsPage/Job";
-import { useSelector } from "react-redux";
+import {  useSelector } from "react-redux";
 import useGetAllJobs from "../hooks/useGetAllJobs";
 
 
 
 const Jobs = () => {
+
+
   useGetAllJobs()
   const {allJobs}=useSelector(store=>store.job)
   return (

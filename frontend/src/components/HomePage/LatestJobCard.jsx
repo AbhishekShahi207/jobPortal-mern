@@ -1,12 +1,15 @@
 import React from 'react'
 import { Badge } from "@/components/ui/badge"
+import { Avatar, AvatarImage } from '../ui/avatar'
 
 const LatestJobCard = ({job}) => {
 
   return (
     <div className='p-5 rounded-md shadow-xl bg-white border border-gray-100 cursor pointer'>
       <div>
-        <h1 className='font-medium text-lg'>{job?.company?.name}</h1>
+      
+          <h1 className='font-medium text-lg'>{job?.company?.name}</h1>
+  
       <p className='text-sm text-gray-600'  >India</p>
       </div>
       <div>
@@ -15,7 +18,7 @@ const LatestJobCard = ({job}) => {
       </div>
       <div className='flex items-center gap-2 mt-4 '>
         <Badge className={'text-[#F83003] font-bold'} variant="ghost">{job?.position} Positions</Badge>
-        <Badge className={'text-blackfont-bold'} variant="ghost">{job?.jobType}</Badge>
+        <Badge className={'text-[#F83003] font-bold'} variant="ghost">{job?.jobType}</Badge>
         <Badge className={'text-[#F83003] font-bold'} variant="ghost">{job?.salary} LPA</Badge>
       </div>
 

@@ -10,12 +10,13 @@ import AppliedJobTable from "../JobsPage/AppliedJobTable";
 import { useState } from "react";
 import UpdateProfileDialog from "./UpdateProfileDialog";
 import { useSelector } from "react-redux";
+import useGetAppliedJob from "../../hooks/useGetAppliedJob";
 
 
 
 
 const Profile = () => {
-
+useGetAppliedJob()
     const[open,setOpen]=useState(false)
     const {user} = useSelector(store=>store.auth)
 const isResume =true;
@@ -32,8 +33,7 @@ const isResume =true;
             <Avatar className="">
               <AvatarImage
                 className="h-10 w-10"
-                src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Google_Favicon_2025.svg/330px-Google_Favicon_2025.svg.png"
-                alt="profileImage"
+                src={user?.profile?.profilePhoto}
               />
             </Avatar>
             <div>

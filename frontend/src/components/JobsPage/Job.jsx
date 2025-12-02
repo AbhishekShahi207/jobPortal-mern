@@ -29,7 +29,7 @@ return Math.floor(timeDifference/(1000*24*60*60))
       <div className="flex items-center gap-2 my-2">
         <Button className="p-6" variant="outline" size="icon">
           <Avatar>
-            <AvatarImage src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Google_Favicon_2025.svg/330px-Google_Favicon_2025.svg.png" />
+            <AvatarImage src={job?.company?.logo} />
           </Avatar>
         </Button>
         <div>
@@ -38,8 +38,8 @@ return Math.floor(timeDifference/(1000*24*60*60))
         </div>
       </div>
       <div >
-<h1 className="font-bold ">{job.title}</h1>
-<p>{job.description}.</p>
+<h1 className="font-bold ">{job?.title}</h1>
+<p>{job?.description}.</p>
       </div>
         <div className='flex items-center gap-2 mt-4 '>
               <Badge className={'text-[#F83003] font-bold'} variant="ghost">{job?.position} Positions</Badge>

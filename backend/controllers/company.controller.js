@@ -1,4 +1,6 @@
 import { Company } from "../models/company.model.js";
+import getDataUri from "../utils/datauri.js";
+import cloudinary from "../utils/cloudinary.js"
 
 export const registerCompany = async (req, res) => {
   try {
@@ -71,30 +73,45 @@ export const getCompanyById =async(req,res)=>{
 }
 
 
-export const updateCompany =async(req,res)=>{
-  
-    try {
-      const {name,description,website,location}=req.body;
-      const file=req.file;
+export const updateCompany = async (req, res) => {
+  try {
+    const { name, description, website, location } = req.body;
 
+    let logo; // keep existing logo or update
+    console.log(req.file)
+    // Only upload if a new file was provided
+    if (req.file) {
+      const fileUri = getDataUri(req.file);
+      const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
+      logo = cloudResponse.secure_url;
+    }
+    console.log(req.file)
 
-            const updateData = { name, description, website, location};
+    // Build update object
+    const updateData = { name, description, website, location };
 
-        const company = await Company.findByIdAndUpdate(req.params.id, updateData, { new: true });
+    if (logo) updateData.logo = logo; // only override if new logo uploaded
 
-        if (!company) {
-            return res.status(404).json({
-                message: "Company not found.",
-                success: false
-            })
-        }
-        return res.status(200).json({
-            message:"Company information updated.",
-            success:true
-        })
+    const company = await Company.findByIdAndUpdate(req.params.id, updateData, {
+      new: true,
+    });
 
-    } 
-   catch (error) {
-    console.log("Error in update commpany",error)
-    return res.status(500).json({message:"Internl server Error",success:false})
-  }}
+    if (!company) {
+      return res.status(404).json({
+        message: "Company not found.",
+        success: false,
+      });
+    }
+
+    return res.status(200).json({
+      message: "Company information updated.",
+      success: true,
+      company,
+    });
+  } catch (error) {
+    console.log("Error in update company", error);
+    return res
+      .status(500)
+      .json({ message: "Internal server Error", success: false });
+  }
+};
